@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pacha_mobile_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pacha_mobile}
+      POSTGRES_USER: ${POSTGRES_USER:-pacha}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pacha123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pacha_mobile_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pacha} -d ${POSTGRES_DB:-pacha_mobile}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: pacha_mobile_api
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+volumes:
+  pacha_mobile_data:

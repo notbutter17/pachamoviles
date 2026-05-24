@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'config/app_theme.dart';
+import 'providers/auth_provider.dart';
+import 'providers/room_provider.dart';
+import 'repositories/auth_repository.dart';
+import 'repositories/room_repository.dart';
+import 'routes/app_routes.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/rooms/room_detail_screen.dart';
+import 'screens/shell/main_shell.dart';
+import 'screens/splash/splash_screen.dart';
+import 'screens/unauthorized/unauthorized_screen.dart';
+import 'services/api_client.dart';
+import 'services/secure_storage_service.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Dependency wiring (manual DI, no service locator needed) ──
+  final storage = SecureStorageService();
+  final apiClient = ApiClient(storage);
+  final authRepository = AuthRepository(apiClient);
+  final roomRepository = RoomRepository(apiClient);
+
+  final authProvider = AuthProvider(authRepository, storage);
+  // Let the API client force a logout when token refresh fails.
+  apiClient.onSessionExpired = authProvider.onSessionExpired;
+
+  runApp(
+    PachaSuiteApp(
+      authProvider: authProvider,
+      roomRepository: roomRepository,
+    ),
+  );
+}
+
+class PachaSuiteApp extends StatelessWidget {
+  final AuthProvider authProvider;
+  final RoomRepository roomRepository;
+
+  const PachaSuiteApp({
+    super.key,
+    required this.authProvider,
+    required this.roomRepository,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(create: (_) => RoomProvider(roomRepository)),
+      ],
+      child: MaterialApp(
+        title: 'Pacha Suite',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        initialRoute: AppRoutes.splash,
+        routes: {
+          AppRoutes.splash: (_) => const SplashScreen(),
+          AppRoutes.login: (_) => const LoginScreen(),
+          AppRoutes.shell: (_) => const MainShell(),
+          AppRoutes.unauthorized: (_) => const UnauthorizedScreen(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == AppRoutes.roomDetail) {
+            final id = settings.arguments as int;
+            return MaterialPageRoute(
+              builder: (_) => RoomDetailScreen(roomId: id),
+            );
+          }
+          return null;
+        },
+      ),
+    );
+  }
+}
