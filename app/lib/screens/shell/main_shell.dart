@@ -40,13 +40,10 @@ class _MainShellState extends State<MainShell> {
             child: CircleAvatar(
               backgroundColor: AppColors.primary,
               radius: 16,
-              child: Text(
-                auth.user?.initials ?? '?',
-                style: const TextStyle(
-                  color: AppColors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Icon(
+                auth.isAdmin ? Icons.shield : Icons.badge,
+                color: AppColors.white,
+                size: 16,
               ),
             ),
           ),
@@ -87,7 +84,6 @@ class _AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final user = auth.user;
 
     return Drawer(
       backgroundColor: AppColors.textDark,
@@ -101,13 +97,10 @@ class _AppDrawer extends StatelessWidget {
                   CircleAvatar(
                     radius: 26,
                     backgroundColor: AppColors.primary,
-                    child: Text(
-                      user?.initials ?? '?',
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                      ),
+                    child: Icon(
+                      auth.isAdmin ? Icons.shield : Icons.badge,
+                      color: AppColors.white,
+                      size: 22,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -116,11 +109,11 @@ class _AppDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user?.name ?? '—',
+                          auth.role.label ?? '—',
                           style: const TextStyle(
                             color: AppColors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 15,
+                            fontSize: 14,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -142,8 +135,7 @@ class _AppDrawer extends StatelessWidget {
             _item(context, Icons.dashboard_outlined, 'Dashboard', 0),
             _item(context, Icons.king_bed_outlined, 'Habitaciones', 1),
             _item(context, Icons.person_outline, 'Perfil', 2),
-            if (auth.isAdmin)
-              const _AdminOnlyHint(),
+            if (auth.isAdmin) const _AdminOnlyHint(),
             const Spacer(),
             const Divider(color: Colors.white12, height: 1),
             ListTile(
@@ -196,7 +188,7 @@ class _AppDrawer extends StatelessWidget {
     if (!context.mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.login,
-      (route) => false,
+          (route) => false,
     );
   }
 }

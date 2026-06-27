@@ -11,7 +11,8 @@ class AppConfig {
   /// - iOS simulator / desktop use localhost
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000/api',
+    //defaultValue: 'http://10.0.2.2:8000/api',
+    defaultValue: 'https://prod-back-pachasuite.onrender.com/api',
   );
 
   static const Duration connectTimeout = Duration(seconds: 15);

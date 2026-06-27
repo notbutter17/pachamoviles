@@ -13,19 +13,18 @@ import 'screens/shell/main_shell.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/unauthorized/unauthorized_screen.dart';
 import 'services/api_client.dart';
-import 'services/secure_storage_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ── Dependency wiring (manual DI, no service locator needed) ──
-  final storage = SecureStorageService();
-  final apiClient = ApiClient(storage);
+  // ── Dependency wiring ──
+  final apiClient = ApiClient();
+  await apiClient.init(); // inicializa el CookieJar (necesita path_provider)
+
   final authRepository = AuthRepository(apiClient);
   final roomRepository = RoomRepository(apiClient);
 
-  final authProvider = AuthProvider(authRepository, storage);
-  // Let the API client force a logout when token refresh fails.
+  final authProvider = AuthProvider(authRepository, apiClient);
   apiClient.onSessionExpired = authProvider.onSessionExpired;
 
   runApp(

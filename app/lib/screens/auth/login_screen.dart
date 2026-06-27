@@ -102,8 +102,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   loading: auth.loading,
                   onPressed: _submit,
                 ),
-                const SizedBox(height: 24),
-                _demoHint(),
               ],
             ),
           ),
@@ -158,29 +156,6 @@ class _LoginScreenState extends State<LoginScreen> {
               style: const TextStyle(color: AppColors.danger, fontSize: 13),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _demoHint() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.creamSoft,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Cuentas de demo',
-              style: TextStyle(
-                  fontWeight: FontWeight.w700, color: AppColors.textDark)),
-          SizedBox(height: 6),
-          Text('admin@pachasuite.com · admin123',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
-          Text('recepcion@pachasuite.com · recepcion123',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 13)),
         ],
       ),
     );

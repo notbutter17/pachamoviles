@@ -42,9 +42,20 @@ class RoomProvider extends ChangeNotifier {
   }
 
   /// Returns the cached room if present, otherwise fetches the detail.
-  Future<RoomModel> getRoom(int id) async {
+  /// `isAdmin` decides which backend endpoint is used — there's no public
+  /// single-room endpoint, only the full public list and the admin detail.
+  Future<RoomModel> getRoom(int id, {required bool isAdmin}) async {
     final cached = _rooms.where((r) => r.id == id);
     if (cached.isNotEmpty) return cached.first;
-    return _repo.fetchById(id);
+    return _repo.fetchById(id, isAdmin: isAdmin);
+  }
+
+  /// Updates the local cache after an admin edit, so screens that already
+  /// loaded the list reflect the change without a full refetch.
+  void replaceInCache(RoomModel updated) {
+    final idx = _rooms.indexWhere((r) => r.id == updated.id);
+    if (idx == -1) return;
+    _rooms[idx] = updated;
+    notifyListeners();
   }
 }

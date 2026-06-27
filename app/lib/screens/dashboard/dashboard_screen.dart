@@ -20,7 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<RoomProvider>().loadRooms(),
+          (_) => context.read<RoomProvider>().loadRooms(),
     );
   }
 
@@ -55,17 +55,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  /// The backend's login response only carries {email, rol} — no display
+  /// name — so the greeting falls back to the email instead of a first
+  /// name.
   Widget _greeting(BuildContext context, AuthProvider auth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Hola, ${auth.user?.name.split(' ').first ?? ''} 👋',
+          'Hola 👋',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 4),
         Text(
-          'Resumen operativo de Hotel Pacha Suite',
+          auth.user?.email ?? 'Resumen operativo de Hotel Pacha Suite',
           style: const TextStyle(color: AppColors.textMuted),
         ),
       ],
@@ -96,7 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         KpiCard(
           icon: Icons.person_outline,
           accent: AppColors.danger,
-          value: '${rooms.countByStatus(RoomStatus.ocupada)}',
+          value: '${rooms.countByStatus(RoomStatus.finalizada)}',
           label: 'Ocupadas',
         ),
         KpiCard(
@@ -124,7 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _occupancyCard(RoomProvider rooms, bool loading) {
     final total = rooms.total;
-    final occupied = rooms.countByStatus(RoomStatus.ocupada);
+    final occupied = rooms.countByStatus(RoomStatus.finalizada);
     final ratio = total == 0 ? 0.0 : occupied / total;
 
     return Card(
