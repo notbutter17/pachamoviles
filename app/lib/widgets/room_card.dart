@@ -102,9 +102,9 @@ class RoomCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: room.imagen.isNotEmpty
+      child: room.imagenes.isNotEmpty
           ? Image.network(
-              room.imagen,
+              room.imagenPrincipal,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => _placeholderIcon(),
             )

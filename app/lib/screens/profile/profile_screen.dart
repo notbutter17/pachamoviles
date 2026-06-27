@@ -12,7 +12,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final user = auth.user;
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -24,27 +23,24 @@ class ProfileScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 44,
                 backgroundColor: AppColors.primary,
-                child: Text(
-                  user?.initials ?? '?',
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                  ),
+                child: Icon(
+                  auth.isAdmin ? Icons.shield : Icons.badge,
+                  color: AppColors.white,
+                  size: 38,
                 ),
               ),
               const SizedBox(height: 16),
-              Text(user?.name ?? '—',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              Text(auth.user?.email ?? '—',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center),
               const SizedBox(height: 6),
               _roleChip(auth.role),
             ],
           ),
         ),
         const SizedBox(height: 28),
-        _infoTile(Icons.mail_outline, 'Email', user?.email ?? '—'),
+        _infoTile(Icons.mail_outline, 'Email', auth.user?.email ?? '—'),
         _infoTile(Icons.badge_outlined, 'Rol', auth.role.label),
-        _infoTile(Icons.tag, 'ID de usuario', '${user?.id ?? '—'}'),
         const SizedBox(height: 28),
         OutlinedButton.icon(
           onPressed: () => _logout(context),
@@ -106,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
     if (!context.mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.login,
-      (route) => false,
+          (route) => false,
     );
   }
 }

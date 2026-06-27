@@ -1,30 +1,12 @@
-/// Staff roles, matching the Django backend (`ADMIN`, `RECEPCIONISTA`).
+/// Mirrors Usuario.UsuarioRol on the backend: only two roles exist for
+/// hotel staff. Guests never log in — they're verified via the 6-digit
+/// code flow (PublicController), not via /api/auth/login.
 enum UserRole {
   admin,
   recepcionista,
   unknown;
 
-  static UserRole fromApi(String? value) {
-    switch (value?.toUpperCase()) {
-      case 'ADMIN':
-        return UserRole.admin;
-      case 'RECEPCIONISTA':
-        return UserRole.recepcionista;
-      default:
-        return UserRole.unknown;
-    }
-  }
-
-  String get apiValue {
-    switch (this) {
-      case UserRole.admin:
-        return 'ADMIN';
-      case UserRole.recepcionista:
-        return 'RECEPCIONISTA';
-      case UserRole.unknown:
-        return 'UNKNOWN';
-    }
-  }
+  bool get isAdmin => this == UserRole.admin;
 
   String get label {
     switch (this) {
@@ -37,5 +19,16 @@ enum UserRole {
     }
   }
 
-  bool get isAdmin => this == UserRole.admin;
+  /// Maps the raw string the backend sends in the login response
+  /// ({"rol": "ROLE_ADMIN" | "ROLE_RECEPCIONISTA"}).
+  static UserRole fromBackend(String? raw) {
+    switch (raw) {
+      case 'ROLE_ADMIN':
+        return UserRole.admin;
+      case 'ROLE_RECEPCIONISTA':
+        return UserRole.recepcionista;
+      default:
+        return UserRole.unknown;
+    }
+  }
 }
