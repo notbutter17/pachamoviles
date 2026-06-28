@@ -8,8 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.pacha_suite_mobile"
-    compileSdk = 35
-
+    compileSdk = 36        // ← cámbialo de 35 a 36
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -23,7 +22,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pacha_suite_mobile"
-        minSdk = flutter.minSdkVersion
+        // flutter_secure_storage requiere 23; webview_flutter/url_launcher OK.
+        minSdk = maxOf(23, flutter.minSdkVersion)
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"

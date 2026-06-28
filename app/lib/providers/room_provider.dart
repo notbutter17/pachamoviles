@@ -58,4 +58,30 @@ class RoomProvider extends ChangeNotifier {
     _rooms[idx] = updated;
     notifyListeners();
   }
+
+  /// HU "amenidades SI/NO": persiste el toggle de amenidades de una
+  /// habitación (PUT /admin/habitaciones/{id}/amenidades) y refresca la
+  /// caché local. Lanza [ApiException] si el backend rechaza el cambio.
+  Future<void> setAmenidades(int id, Map<String, bool> amenidades) async {
+    final updated = await _repo.updateAmenidades(id, amenidades);
+    replaceInCache(updated);
+  }
+
+  // ── Crear habitación (demo local) ──
+  //
+  // El backend desplegado todavía no expone POST para crear habitaciones,
+  // así que la nueva habitación solo se agrega a la lista en memoria. Se
+  // pierde al cerrar la app; sirve para demostrar el formulario y la UI.
+  int _localIdSeq = -1;
+
+  /// id negativo y decreciente para no chocar con los ids reales del
+  /// backend (siempre positivos).
+  int get nextLocalId => _localIdSeq--;
+
+  /// Agrega una habitación creada localmente al inicio de la lista.
+  void addLocalRoom(RoomModel room) {
+    _rooms = [room, ..._rooms];
+    if (_listState != LoadState.success) _listState = LoadState.success;
+    notifyListeners();
+  }
 }

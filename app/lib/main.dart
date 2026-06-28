@@ -4,16 +4,21 @@ import 'package:provider/provider.dart';
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cochera_provider.dart';
+import 'providers/contact_provider.dart';
 import 'providers/reservation_provider.dart';
 import 'providers/room_provider.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/cochera_repository.dart';
+import 'repositories/contact_repository.dart';
 import 'repositories/reservation_repository.dart';
 import 'repositories/room_repository.dart';
 import 'routes/app_routes.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/contact/contact_screen.dart';
 import 'screens/rooms/assigned_room_screen.dart';
+import 'screens/rooms/room_create_screen.dart';
 import 'screens/rooms/room_detail_screen.dart';
+import 'screens/services/services_screen.dart';
 import 'screens/shell/main_shell.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/unauthorized/unauthorized_screen.dart';
@@ -30,6 +35,7 @@ void main() async {
   final roomRepository = RoomRepository(apiClient);
   final cocheraRepository = CocheraRepository(apiClient);
   final reservationRepository = ReservationRepository(apiClient);
+  final contactRepository = ContactRepository(apiClient);
 
   final authProvider = AuthProvider(authRepository, apiClient);
   apiClient.onSessionExpired = authProvider.onSessionExpired;
@@ -40,6 +46,7 @@ void main() async {
       roomRepository: roomRepository,
       cocheraRepository: cocheraRepository,
       reservationRepository: reservationRepository,
+      contactRepository: contactRepository,
     ),
   );
 }
@@ -49,6 +56,7 @@ class PachaSuiteApp extends StatelessWidget {
   final RoomRepository roomRepository;
   final CocheraRepository cocheraRepository;
   final ReservationRepository reservationRepository;
+  final ContactRepository contactRepository;
 
   const PachaSuiteApp({
     super.key,
@@ -56,6 +64,7 @@ class PachaSuiteApp extends StatelessWidget {
     required this.roomRepository,
     required this.cocheraRepository,
     required this.reservationRepository,
+    required this.contactRepository,
   });
 
   @override
@@ -68,6 +77,8 @@ class PachaSuiteApp extends StatelessWidget {
             create: (_) => CocheraProvider(cocheraRepository)),
         ChangeNotifierProvider(
             create: (_) => ReservationProvider(reservationRepository)),
+        ChangeNotifierProvider(
+            create: (_) => ContactProvider(contactRepository)),
       ],
       child: MaterialApp(
         title: 'Pacha Suite',
@@ -79,6 +90,9 @@ class PachaSuiteApp extends StatelessWidget {
           AppRoutes.login: (_) => const LoginScreen(),
           AppRoutes.shell: (_) => const MainShell(),
           AppRoutes.unauthorized: (_) => const UnauthorizedScreen(),
+          AppRoutes.services: (_) => const ServicesScreen(),
+          AppRoutes.contact: (_) => const ContactScreen(),
+          AppRoutes.roomCreate: (_) => const RoomCreateScreen(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == AppRoutes.roomDetail) {
