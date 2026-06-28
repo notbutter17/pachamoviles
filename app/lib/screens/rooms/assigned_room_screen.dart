@@ -19,6 +19,15 @@ class AssignedRoomScreen extends StatefulWidget {
 class _AssignedRoomScreenState extends State<AssignedRoomScreen> {
   late Future<RoomModel> _future;
 
+  static const _amenidadLabels = <String, (String, IconData)>{
+    'internet': ('Internet', Icons.wifi),
+    'cableNetflix': ('Cable/Netflix', Icons.tv_outlined),
+    'banoPrivado': ('Baño privado', Icons.bathtub_outlined),
+    'buffetAndino': ('Buffet Andino', Icons.restaurant_outlined),
+    'cochera': ('Cochera', Icons.local_parking_outlined),
+    'spa': ('Spa', Icons.spa_outlined),
+  };
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +73,8 @@ class _AssignedRoomScreenState extends State<AssignedRoomScreen> {
               _roomInfo(room),
               const SizedBox(height: 24),
               _specsList(room),
+              const SizedBox(height: 24),
+              _amenidadesSection(room),
             ],
           ),
         ),
@@ -231,6 +242,63 @@ class _AssignedRoomScreenState extends State<AssignedRoomScreen> {
                   color: AppColors.chocolate)),
         ],
       ),
+    );
+  }
+
+  Widget _amenidadesSection(RoomModel room) {
+    final entries = _amenidadLabels.entries.toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Amenidades incluidas',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 12),
+        ...entries.map((e) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _amenidadRow(
+                label: e.value.$1,
+                icon: e.value.$2,
+                active: room.amenidad(e.key),
+              ),
+            )),
+      ],
+    );
+  }
+
+  Widget _amenidadRow({
+    required String label,
+    required IconData icon,
+    required bool active,
+  }) {
+    final color = active ? AppColors.success : AppColors.textMuted;
+    return Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.success.withValues(alpha: 0.1)
+                : AppColors.creamSoft,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(label,
+              style: TextStyle(
+                  fontWeight: FontWeight.w600, fontSize: 14, color: color)),
+        ),
+        Icon(
+          active ? Icons.check_circle : Icons.cancel_outlined,
+          size: 20,
+          color: color,
+        ),
+      ],
     );
   }
 
