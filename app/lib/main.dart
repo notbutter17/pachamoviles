@@ -10,6 +10,7 @@ import 'repositories/cochera_repository.dart';
 import 'repositories/room_repository.dart';
 import 'routes/app_routes.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/rooms/assigned_room_screen.dart';
 import 'screens/rooms/room_detail_screen.dart';
 import 'screens/shell/main_shell.dart';
 import 'screens/splash/splash_screen.dart';
@@ -76,6 +77,12 @@ class PachaSuiteApp extends StatelessWidget {
             final id = settings.arguments as int;
             return MaterialPageRoute(
               builder: (_) => RoomDetailScreen(roomId: id),
+            );
+          }
+          if (settings.name == AppRoutes.assignedRoom) {
+            final id = settings.arguments as int;
+            return MaterialPageRoute(
+              builder: (_) => AssignedRoomScreen(roomId: id),
             );
           }
           return null;

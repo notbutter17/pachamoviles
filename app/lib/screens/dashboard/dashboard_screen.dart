@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../models/room_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/room_provider.dart';
+import '../../routes/app_routes.dart';
 import '../../widgets/kpi_card.dart';
 import '../../widgets/shimmer_box.dart';
 
@@ -39,6 +40,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           _greeting(context, auth),
           const SizedBox(height: 20),
+          _assignedRoomCard(context, rooms, loading),
+          const SizedBox(height: 20),
           loading ? _kpiSkeleton() : _kpiGrid(rooms),
           const SizedBox(height: 24),
           Text('Resumen del hotel',
@@ -58,6 +61,87 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// The backend's login response only carries {email, rol} — no display
   /// name — so the greeting falls back to the email instead of a first
   /// name.
+  Widget _assignedRoomCard(BuildContext context, RoomProvider rooms, bool loading) {
+    if (loading || rooms.rooms.isEmpty) return const SizedBox.shrink();
+
+    final room = rooms.rooms.first;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Navigator.of(context).pushNamed(
+          AppRoutes.assignedRoom,
+          arguments: room.id,
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 100,
+              height: 90,
+              child: room.imagenPrincipal.isNotEmpty
+                  ? Image.network(room.imagenPrincipal,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _roomPlaceholder())
+                  : _roomPlaceholder(),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.king_bed_outlined,
+                            size: 16, color: AppColors.primary),
+                        const SizedBox(width: 6),
+                        Text('Mi Habitación',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                    color: AppColors.textMuted, fontSize: 11)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Nº ${room.numero}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 22,
+                      ),
+                    ),
+                    Text(
+                      '${room.nombre} · ${room.tipoLabel}',
+                      style: const TextStyle(
+                          color: AppColors.textMuted, fontSize: 13),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: Icon(Icons.arrow_forward_ios,
+                  size: 14, color: AppColors.textMuted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _roomPlaceholder() {
+    return Container(
+      color: AppColors.chocolate,
+      child: const Center(
+        child:
+            Icon(Icons.king_bed_outlined, color: Colors.white38, size: 32),
+      ),
+    );
+  }
+
   Widget _greeting(BuildContext context, AuthProvider auth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
