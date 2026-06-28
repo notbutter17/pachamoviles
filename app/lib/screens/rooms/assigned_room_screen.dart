@@ -6,6 +6,7 @@ import '../../models/room_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/room_provider.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/stay_progress_bar.dart';
 
 class AssignedRoomScreen extends StatefulWidget {
   final int roomId;
@@ -71,6 +72,11 @@ class _AssignedRoomScreenState extends State<AssignedRoomScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _roomInfo(room),
+              const SizedBox(height: 16),
+              StayProgressBar(
+                checkIn: DateTime.now().subtract(const Duration(days: 1)),
+                checkOut: DateTime.now().add(const Duration(days: 3)),
+              ),
               const SizedBox(height: 24),
               _specsList(room),
               const SizedBox(height: 24),
