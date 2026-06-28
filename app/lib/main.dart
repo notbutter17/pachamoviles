@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 import 'config/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cochera_provider.dart';
+import 'providers/reservation_provider.dart';
 import 'providers/room_provider.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/cochera_repository.dart';
+import 'repositories/reservation_repository.dart';
 import 'repositories/room_repository.dart';
 import 'routes/app_routes.dart';
 import 'screens/auth/login_screen.dart';
@@ -27,6 +29,7 @@ void main() async {
   final authRepository = AuthRepository(apiClient);
   final roomRepository = RoomRepository(apiClient);
   final cocheraRepository = CocheraRepository(apiClient);
+  final reservationRepository = ReservationRepository(apiClient);
 
   final authProvider = AuthProvider(authRepository, apiClient);
   apiClient.onSessionExpired = authProvider.onSessionExpired;
@@ -36,6 +39,7 @@ void main() async {
       authProvider: authProvider,
       roomRepository: roomRepository,
       cocheraRepository: cocheraRepository,
+      reservationRepository: reservationRepository,
     ),
   );
 }
@@ -44,12 +48,14 @@ class PachaSuiteApp extends StatelessWidget {
   final AuthProvider authProvider;
   final RoomRepository roomRepository;
   final CocheraRepository cocheraRepository;
+  final ReservationRepository reservationRepository;
 
   const PachaSuiteApp({
     super.key,
     required this.authProvider,
     required this.roomRepository,
     required this.cocheraRepository,
+    required this.reservationRepository,
   });
 
   @override
@@ -60,6 +66,8 @@ class PachaSuiteApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RoomProvider(roomRepository)),
         ChangeNotifierProvider(
             create: (_) => CocheraProvider(cocheraRepository)),
+        ChangeNotifierProvider(
+            create: (_) => ReservationProvider(reservationRepository)),
       ],
       child: MaterialApp(
         title: 'Pacha Suite',

@@ -93,6 +93,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/reservas").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/reservas/{codigo}/enviar-pdf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/reservas/*/enviar-pdf").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/mi-reserva").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/reservas/{codigo}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/mensajes-contacto").permitAll()
                         .requestMatchers("/api/mensajes-contacto/**").hasRole("ADMIN")

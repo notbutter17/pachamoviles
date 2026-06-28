@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -217,6 +218,16 @@ public class ReservaService {
                 reservaRepo.findByCodigoWithDetails(codigo)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Reserva", "codigo", codigo)));
+    }
+
+    @Transactional(readOnly = true)
+    public ReservaResponseDTO findByEmailTitular(String email) {
+        List<Reserva> reservas = reservaRepo.findByHuespedEmail(
+                email, PageRequest.of(0, 1));
+        if (reservas.isEmpty()) {
+            throw new ResourceNotFoundException("Reserva", "email", email);
+        }
+        return ReservaResponseDTO.from(reservas.get(0));
     }
 
     @Transactional(readOnly = true)

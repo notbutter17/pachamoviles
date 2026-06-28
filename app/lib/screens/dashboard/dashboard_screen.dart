@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/room_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/reservation_provider.dart';
 import '../../providers/room_provider.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/kpi_card.dart';
@@ -20,9 +21,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-          (_) => context.read<RoomProvider>().loadRooms(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RoomProvider>().loadRooms();
+      context.read<ReservationProvider>().loadMiReserva();
+    });
   }
 
   @override
@@ -62,8 +64,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// name — so the greeting falls back to the email instead of a first
   /// name.
   Widget _assignedRoomCard(BuildContext context, RoomProvider rooms, bool loading) {
-    if (loading || rooms.rooms.isEmpty) return const SizedBox.shrink();
+    final reservation = context.watch<ReservationProvider>();
+    final hasReservation = reservation.state == ReservationState.success &&
+        reservation.reservation != null;
 
+    if (hasReservation) {
+      final r = reservation.reservation!;
+      return Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => Navigator.of(context).pushNamed(
+            AppRoutes.assignedRoom,
+            arguments: r.habitacionId,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 100,
+                height: 90,
+                color: AppColors.chocolate,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.king_bed_outlined,
+                          color: Colors.white38, size: 28),
+                      const SizedBox(height: 2),
+                      Text('Nº ${r.habitacionNumero}',
+                          style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.event_available,
+                              size: 16, color: AppColors.primary),
+                          const SizedBox(width: 6),
+                          Text('Mi Reserva',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(
+                                      color: AppColors.textMuted,
+                                      fontSize: 11)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        r.habitacionNombre,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${r.habitacionTipo} · ${r.noches} noche${r.noches == 1 ? '' : 's'}',
+                        style: const TextStyle(
+                            color: AppColors.textMuted, fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: Icon(Icons.arrow_forward_ios,
+                    size: 14, color: AppColors.textMuted),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Fallback: show first room from list if reservation unavailable
+    if (loading || rooms.rooms.isEmpty) return const SizedBox.shrink();
     final room = rooms.rooms.first;
 
     return Card(

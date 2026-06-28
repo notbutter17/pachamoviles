@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/room_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/reservation_provider.dart';
 import '../../providers/room_provider.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/stay_progress_bar.dart';
@@ -73,10 +74,7 @@ class _AssignedRoomScreenState extends State<AssignedRoomScreen> {
             children: [
               _roomInfo(room),
               const SizedBox(height: 16),
-              StayProgressBar(
-                checkIn: DateTime.now().subtract(const Duration(days: 1)),
-                checkOut: DateTime.now().add(const Duration(days: 3)),
-              ),
+              _stayProgress(),
               const SizedBox(height: 24),
               _specsList(room),
               const SizedBox(height: 24),
@@ -249,6 +247,18 @@ class _AssignedRoomScreenState extends State<AssignedRoomScreen> {
         ],
       ),
     );
+  }
+
+  Widget _stayProgress() {
+    final reservation = context.watch<ReservationProvider>();
+    if (reservation.state == ReservationState.success &&
+        reservation.reservation != null) {
+      return StayProgressBar(
+        checkIn: reservation.reservation!.checkIn,
+        checkOut: reservation.reservation!.checkOut,
+      );
+    }
+    return StayProgressBar();
   }
 
   Widget _amenidadesSection(RoomModel room) {
